@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: courses_db
+    restart: always
+    environment:
+      POSTGRES_DB: courses_db
+      POSTGRES_USER: courses_user
+      POSTGRES_PASSWORD: courses_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

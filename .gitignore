@@ -1,0 +1,21 @@
+.venv
+.idea
+.env
+db.sqlite3
+media/product/video_2025-05-09_17-32-13.mp4
+# Django
+*.pyc
+__pycache__/
+/media/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
+# Virtual environment
+venv/
+.env/
+

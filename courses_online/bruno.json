@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "courses_online",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
