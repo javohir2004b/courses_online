@@ -23,7 +23,7 @@ class CategoryListAPIView(generics.ListAPIView):   #kategoriyalar royxati
         OpenApiParameter(name='category', type=str, description='Kategoriya slug (vergul bilan)', required=False),
         OpenApiParameter(name='search', type=str, description='Kurs nomi bo‘yicha qidirish', required=False),
         OpenApiParameter(name='level', type=str, description='beginner/intermediate/advanced', required=False),
-        OpenApiParameter(name='price', type=str, description='free/paid', required=False),
+        # OpenApiParameter(name='price', type=str, description='free/paid', required=False),
         OpenApiParameter(name='rating', type=int, description='Minimum rating (1–5)', required=False),
     ]
 )
@@ -138,26 +138,8 @@ class DashboardStatisticAPIView(APIView):
         return Response(data , status=status.HTTP_200_OK)
 
 
-# @extend_schema(tags=['qoshimcha '])
-# class CourseReviewListCreateAPIview(generics.ListCreateAPIView):
-#     serializer_class = CourseReviewSerializer
-#     permission_classes = [IsAuthenticated]
-#
-#     def get_queryset(self):
-#         course_slug = self.kwargs['slug']
-#         return CoursReview.objects.filter(course__slug=course_slug).select_related('user')
-#
-#     def perform_create(self, serializer):
-#         course = Course.objects.get(slug=self.kwargs['slug'])
-#         review = serializer.save(course=course,user=self.request.user)
-#         agg = course.reviews.aggregate(avg=Avg('rating'))
-#         course.reviews_count = course.reviews_count()
-#         course.avg_rating = agg['avg'] or 0
-#         serializer.save(update_fields=['reviews_count','avg_rating'])
-#         return review
 
-
-@extend_schema(tags=['qoshimcha '])
+@extend_schema(tags=['baholash va sharh '])
 class CourseReviewListCreateAPIview(generics.ListCreateAPIView):
     serializer_class = CourseReviewSerializer
     permission_classes = [IsAuthenticated]

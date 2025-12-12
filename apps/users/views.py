@@ -9,7 +9,8 @@ from django.conf import settings
 
 from .models import PasswordReset ,User
 from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, LogoutSerializer, \
-    InstructorDetailSerializer, InstructorListSerializer, ForgotPasswordSerializer, ResetPasswordSerializer
+    InstructorDetailSerializer, InstructorListSerializer, ForgotPasswordSerializer, PasswordResetRequestSerializer, \
+    PasswordResetConfirmSerializer, ForgotPasswordEmailSerializer, ResetPasswordWithCodeSerializer
 
 User = get_user_model()
 
@@ -107,16 +108,58 @@ class ForgotPasswordAPIView(generics.GenericAPIView):
         except Exception:
             pass
         return Response(
-            {'detail':'Emailga token ham qaytarildi','token':str(reset.token)},status=status.HTTP_200_OK,
+            {'detail':'Emailga xabar yuborildi','token':str(reset.token)},status=status.HTTP_200_OK,
         )
 
-@extend_schema(tags=['qoshimcha '])
-class ResetPasswordAPIView(generics.GenericAPIView):
-    serializer_class = ResetPasswordSerializer
+
+@extend_schema(tags=['qoshimcha 1'])
+class PasswordResetRequestAPIView(generics.GenericAPIView):
+    serializer_class = PasswordResetRequestSerializer
     permission_classes = [AllowAny]
 
-    def post(self,request):
+    def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({'detail':'parol muvafaqiyatli ozgartirildi.'}, status=status.HTTP_200_OK)
+        return Response(
+            {"detail": "Reset code has been sent to your email."},
+            status=status.HTTP_200_OK
+        )
+
+@extend_schema(tags=['qoshimcha 1'])
+class PasswordResetConfirmAPIView(generics.GenericAPIView):
+    serializer_class = PasswordResetConfirmSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            {"detail": "Password has been reset successfully."},
+            status=status.HTTP_200_OK
+        )
+
+
+@extend_schema(tags=["register"])
+class ForgotPasswordEmailView(generics.GenericAPIView):
+    serializer_class = ForgotPasswordEmailSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": "Kod emailingizga yuborildi"}, status=200)
+
+
+@extend_schema(tags=["register"])
+class ResetPasswordWithCodeView(generics.GenericAPIView):
+    serializer_class = ResetPasswordWithCodeSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": "Parol muvaffaqiyatli o'zgartirildi!"}, status=200)

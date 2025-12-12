@@ -33,34 +33,6 @@ class CourseListSerializer(serializers.ModelSerializer):     #Kurslar royxati
 
 
 
-# baholash va sharh
-
-# class CourseReviewSerializer(serializers.ModelSerializer):
-#     # user = serializers.CharField(source='user.username',read_only=True)
-#     user = serializers.StringRelatedField(read_only=True)
-#
-#     class Meta:
-#         model = CoursReview
-#         fields = ['id','user','rating','comment','created_at']
-#         read_only_fields = ['id','user','created_at']
-#
-#     def validate_rating(self,value):
-#         if value < 1 or value >5:
-#             raise serializers.ValidationError("rating 1 dan 5 gacha bolish kere")
-#         return value
-#
-#
-#     # def create(self, validated_data):
-#     #     request = self.context.get("request")
-#     #     course = validated_data.get("course")
-#     #     validated_data['user'] = request.user
-#     #     validated_data['course']=course
-#     #     review = super().create(validated_data)
-#
-#         course.reviews_count = course.reviews_count()
-#         course.avg_rating = course.reviews.aggregate(models.Avg("rating"))['rating__avg']or 0
-#         course.save(update_fields=['reviews_count','avg_rating'])
-#         return review
 
 #hozir yozgan kod
 class CourseReviewSerializer(serializers.ModelSerializer):

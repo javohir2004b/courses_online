@@ -1,6 +1,7 @@
 from datetime import timedelta
-
 from pathlib import Path
+import os
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -15,11 +16,12 @@ SECRET_KEY = 'django-insecure-51%z=di^v2tncob=rkutogl21n0(zq&r2kzh)l9^q&2%f@f$=k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,localhost").split(",")
+
+
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -123,6 +125,21 @@ SIMPLE_JWT = {
 }
 
 
+
+
+# telegram
+TELEGRAM_BOT_TOKEN = config("TELEGRAM_BOT_TOKEN", default=None)
+TELEGRAM_WEBHOOK_SECRET = config("TELEGRAM_WEBHOOK_SECRET", default="mysecret123")
+
+# email
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default=None)
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default=None)
+
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
@@ -139,26 +156,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-# SPECTACULAR_SETTINGS = {
-#     "TITLE": "Online Courses API",
-#     "DESCRIPTION": "EduPress / OnlineCourses uchun DRF backend API hujjatlari",
-#     "VERSION": "1.0.0",
-#
-#     # JWT uchun security schema
-#     "SECURITY": [{"bearerAuth": []}],
-#     "COMPONENTS": {
-#         "securitySchemes": {
-#             "bearerAuth": {
-#                 "type": "http",
-#                 "scheme": "bearer",
-#                 "bearerFormat": "JWT",
-#             },
-#         },
-#     },
-# }
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Online Courses API",
