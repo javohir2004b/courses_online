@@ -16,8 +16,13 @@ SECRET_KEY = 'django-insecure-51%z=di^v2tncob=rkutogl21n0(zq&r2kzh)l9^q&2%f@f$=k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,localhost").split(",")
-
+# ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,localhost").split(",")
+ALLOWED_HOSTS = [
+    "coursesonline-production.up.railway.app",
+    ".up.railway.app",
+    "localhost",
+    "127.0.0.1",
+]
 
 
 
