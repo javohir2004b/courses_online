@@ -37,10 +37,46 @@ class PasswordResetCode(models.Model):
 
 
 # TELEGRAM BOT
-class Telegramchat(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True , blank=True)
-    chat_id = models.CharField(max_length=64 , unique=True)
+from django.conf import settings
+
+class TelegramChat(models.Model):
+    chat_id = models.CharField(max_length=32, unique=True)
+    username = models.CharField(max_length=150, blank=True, null=True)
+    first_name = models.CharField(max_length=150, blank=True, null=True)
+    last_name = models.CharField(max_length=150, blank=True, null=True)
+
+    # 🔑 USER bilan bog‘lanish
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    # 🔁 BOT STATE
+    state = models.CharField(max_length=50, default="new")
+
+    # 🧠 vaqtinchalik ma’lumotlar (register / reset uchun)
+    temp_email = models.EmailField(blank=True, null=True)
+    temp_token = models.CharField(max_length=255, blank=True, null=True)
+
+    last_active = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"TG chat {self.chat_id}"
+        return f"TG {self.chat_id}"
+
+class LoginOTP(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    code = models.CharField(max_length=6)
+    is_used = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_expired(self):
+        return self.created_at < timezone.now() - timedelta(minutes=5)
+
+    def __str__(self):
+        return f"OTP {self.code} for {self.user}"
