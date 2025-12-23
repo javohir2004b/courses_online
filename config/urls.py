@@ -23,11 +23,13 @@ urlpatterns = [
         name="redoc",
     ),
 
+
     path('api/v1/auth/' , include('apps.users.urls')),
     path("api/v1/courses/", include("apps.courses.urls")),
     path('api/v1/blog/', include('apps.blog.urls')),
     path('api/v1/contact/',include('apps.contact.urls')),
     path('api/v1/home/' , include('apps.core.urls')),
     path('api/v1/payments/', include('apps.payments.urls')),
+path("api/v1/payments/", include("apps.payments.urls")),
 
 ]

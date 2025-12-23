@@ -2,33 +2,29 @@ from datetime import timedelta
 from pathlib import Path
 import os
 from decouple import config
+from dotenv import load_dotenv
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / ".env")
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-51%z=di^v2tncob=rkutogl21n0(zq&r2kzh)l9^q&2%f@f$=k'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-# ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,localhost").split(",")
-# ALLOWED_HOSTS = [
-#     "coursesonline-production.up.railway.app",
-#     ".up.railway.app",
-#     "localhost",
-#     "127.0.0.1",
-# ]
+BACKEND_BASE_URL = "http://127.0.0.1:8000"
 
-ALLOWED_HOSTS = [
-    ".up.railway.app",
-    "localhost",
-    "127.0.0.1",
+ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = [
+    "https://coursesonline-production-474.up.railway.app",
 ]
+
 
 # Application definition
 INSTALLED_APPS = [
@@ -64,6 +60,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
+
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
@@ -98,13 +96,15 @@ REST_FRAMEWORK = {
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "courses_db",
-        "USER": "courses_user",
-        "PASSWORD": "courses_pass",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST", "localhost"),
+        "PORT": os.getenv("DB_PORT", "5432"),
     }
 }
+
+
 
 
 # Password validation
@@ -133,15 +133,13 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
 }
 
+
 CACHES = {
     "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     }
 }
+
 
 
 
@@ -177,6 +175,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Online Courses API",
@@ -202,4 +201,5 @@ SPECTACULAR_SETTINGS = {
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "users.User"
+
 

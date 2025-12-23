@@ -1,8 +1,6 @@
 from django.contrib.auth import get_user_model
-from django.db import models
 from rest_framework import serializers
-
-from apps.courses.models import Course, Category ,Lesson ,Enrollment,CoursReview
+from apps.courses.models import Course, Category ,Lesson ,Enrollment,CourseReview
 
 User = get_user_model()
 
@@ -40,7 +38,7 @@ class CourseReviewSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)
 
     class Meta:
-        model = CoursReview
+        model = CourseReview
         fields = ['id', 'user', 'rating', 'comment', 'created_at']
         read_only_fields = ['id', 'user', 'created_at']
 

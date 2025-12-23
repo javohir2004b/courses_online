@@ -18,4 +18,15 @@ __pycache__/
 # Virtual environment
 venv/
 .env/
+**/.env
+telegram_bot/.env
+
+staticfiles/
+
+
+# 1. django ishga tushirish
+#python manage.py runserver
+
+# 2. tg_botni ishga tushirish
+#python telegram_bot/bot.py
 

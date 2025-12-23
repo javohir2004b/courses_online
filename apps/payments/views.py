@@ -6,6 +6,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from apps.payments.models import Plan,Subscription
 from apps.payments.serializer import PlanSerializer, SubscriptionSerializer, SubscripeSerializer
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+
+from apps.courses.models import Course, Enrollment
 
 @extend_schema(tags=['payments'])
 class PlanListAPIView(generics.ListAPIView): #foydalanuvchilarga korsatiladigan aktiv tariflar
@@ -46,3 +52,6 @@ class DemoSubscriptionAPIView(APIView):
 
         serializer=SubscriptionSerializer(subscription)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+

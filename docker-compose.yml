@@ -6,9 +6,9 @@ services:
     container_name: courses_db
     restart: always
     environment:
-      POSTGRES_DB: courses_db
-      POSTGRES_USER: courses_user
-      POSTGRES_PASSWORD: courses_pass
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -16,3 +16,4 @@ services:
 
 volumes:
   postgres_data:
+

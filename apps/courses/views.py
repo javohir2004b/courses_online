@@ -1,12 +1,12 @@
 from django.db.models.aggregates import Avg
-from drf_spectacular.utils import extend_schema
+from rest_framework.exceptions import PermissionDenied
 from rest_framework import generics, permissions, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 
-from apps.courses.models import Course,Category,Enrollment,Lesson,CoursReview
+from apps.courses.models import Course,Category,Enrollment,Lesson,CourseReview
 from .serializers import CourseListSerializer, CategorySerializer, MyCourseSerializer, CourseDetailSerializer, \
     CourseReviewSerializer
 
@@ -76,30 +76,39 @@ class CourseDetailAPIView(generics.RetrieveAPIView): #bitta kurs (details+lesson
         return ctx
 
 
+
 @extend_schema(tags=['courses'])
-class EnrollCourseAPIView(APIView):  #kursga yozilish viewi
+class EnrollCourseAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self,request,slug):
+    def post(self, request, slug):
         try:
             course = Course.objects.get(slug=slug)
         except Course.DoesNotExist:
-            return Response({'detail':'Course not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"detail": "Course not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
-        enrollment ,created = Enrollment.objects.get_or_create(
+        enrollment, created = Enrollment.objects.get_or_create(
             user=request.user,
             course=course,
-            defaults={'is_active':True}
+            defaults={"is_active": False}
         )
 
-        if not created and not enrollment.is_active:
-            enrollment.is_active = True
-            enrollment.save()
+        if not created:
+            return Response(
+                {"detail": "Siz allaqachon so‘rov yuborgansiz"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        course.students_count = course.enrollments.filter(is_active=True).count()
-        course.save(update_fields=['students_count'])
+        return Response(
+            {"detail": "So‘rovingiz yuborildi. Admin tasdiqlashini kuting."},
+            status=status.HTTP_200_OK
+        )
 
-        return Response({'detail': 'Enrolled successfully'}, status=status.HTTP_200_OK)
+
+
 
 
 @extend_schema(tags=['courses'])
@@ -139,32 +148,53 @@ class DashboardStatisticAPIView(APIView):
 
 
 
-@extend_schema(tags=['baholash va sharh '])
+
+
+@extend_schema(tags=['baholash va sharh'])
 class CourseReviewListCreateAPIview(generics.ListCreateAPIView):
     serializer_class = CourseReviewSerializer
-    permission_classes = [IsAuthenticated]
+
+    # 👇 GET va POST uchun alohida ruxsat
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [AllowAny()]          # 👀 hamma ko‘radi
+        return [IsAuthenticated()]       # ✍️ faqat login yozadi
 
     def get_queryset(self):
         course_slug = self.kwargs['slug']
         return (
-            CoursReview.objects
+            CourseReview.objects
             .filter(course__slug=course_slug)
             .select_related('user')
         )
 
     def perform_create(self, serializer):
         course = Course.objects.get(slug=self.kwargs['slug'])
+        user = self.request.user
 
-        # Reviewni saqlaymiz
+        # ❗ Kursga yozilganligini tekshiramiz
+        if not Enrollment.objects.filter(
+            user=user,
+            course=course,
+            is_active=True
+        ).exists():
+            raise PermissionDenied("Siz bu kursga yozilmagansiz")
+
+        # ❗ Bir user bir marta sharh yozsin
+        if CourseReview.objects.filter(user=user, course=course).exists():
+            raise PermissionDenied("Siz bu kursga allaqachon sharh yozgansiz")
+
+        # ✅ Review saqlanadi
         review = serializer.save(
             course=course,
-            user=self.request.user,
+            user=user,
         )
 
-        # Statistikani yangilaymiz
+        # 📊 Statistikani yangilaymiz
         course.reviews_count = course.reviews.count()
-        agg = course.reviews.aggregate(avg=Avg('rating'))
-        course.avg_rating = agg['avg'] or 0
+        course.avg_rating = course.reviews.aggregate(
+            avg=Avg('rating')
+        )['avg'] or 0
         course.save(update_fields=['reviews_count', 'avg_rating'])
 
         return review

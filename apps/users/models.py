@@ -1,10 +1,12 @@
-import uuid
-from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
+from django.db import models
+from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
@@ -37,28 +39,34 @@ class PasswordResetCode(models.Model):
 
 
 # TELEGRAM BOT
-from django.conf import settings
 
 class TelegramChat(models.Model):
     chat_id = models.CharField(max_length=32, unique=True)
+
     username = models.CharField(max_length=150, blank=True, null=True)
     first_name = models.CharField(max_length=150, blank=True, null=True)
     last_name = models.CharField(max_length=150, blank=True, null=True)
 
-    # 🔑 USER bilan bog‘lanish
+    # 🔑 Django User bilan bog‘lanish
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
+        related_name="telegram_chats"
     )
 
-    # 🔁 BOT STATE
+    # 🔁 BOT STATE (register / login / reset)
     state = models.CharField(max_length=50, default="new")
 
-    # 🧠 vaqtinchalik ma’lumotlar (register / reset uchun)
+    # 🔐 TOKEN
+    access_token = models.TextField(blank=True, null=True)
+    # 🧠 vaqtinchalik ma’lumotlar
     temp_email = models.EmailField(blank=True, null=True)
+    temp_username = models.CharField(max_length=150, blank=True, null=True)
+    temp_password = models.CharField(max_length=128, blank=True, null=True)
     temp_token = models.CharField(max_length=255, blank=True, null=True)
+    temp_is_instructor = models.BooleanField(default=False)
 
     last_active = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -69,7 +77,8 @@ class TelegramChat(models.Model):
 class LoginOTP(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name="login_otps"
     )
     code = models.CharField(max_length=6)
     is_used = models.BooleanField(default=False)
@@ -80,3 +89,4 @@ class LoginOTP(models.Model):
 
     def __str__(self):
         return f"OTP {self.code} for {self.user}"
+

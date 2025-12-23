@@ -2,7 +2,7 @@ import random
 from django.conf import settings
 from rest_framework import serializers
 from django.contrib.auth import authenticate, get_user_model
-from .models import User, PasswordReset, PasswordResetCode
+from .models import PasswordReset, PasswordResetCode
 from ..courses.serializers import CourseListSerializer
 from django.core.mail import send_mail
 

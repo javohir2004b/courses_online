@@ -55,7 +55,7 @@ class Lesson(models.Model):
 class Enrollment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="enrollments")
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="enrollments")
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
@@ -67,7 +67,7 @@ class Enrollment(models.Model):
 
 # Review rating qism
 
-class CoursReview(models.Model):
+class CourseReview(models.Model):
     course = models.ForeignKey(Course , on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(User, on_delete=models.CASCADE , related_name='course_reviews')
     rating = models.PositiveIntegerField()
